@@ -128,7 +128,7 @@ class _ShopsScreenState extends State<ShopsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.white,
+      backgroundColor: AppTheme.softPink,
       appBar: AppBar(
         title: const Text('Discover Shops'),
         backgroundColor: AppTheme.primaryPink,
@@ -191,6 +191,15 @@ class _ShopsScreenState extends State<ShopsScreen> {
               decoration: InputDecoration(
                 hintText: 'Search shops, categories...',
                 prefixIcon: const Icon(Icons.search, color: AppTheme.primaryPink),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear, color: AppTheme.primaryPink),
+                        onPressed: () {
+                          _searchController.clear();
+                          _filterShops('');
+                        },
+                      )
+                    : null,
                 filled: true,
                 fillColor: AppTheme.white,
                 border: OutlineInputBorder(
@@ -211,29 +220,37 @@ class _ShopsScreenState extends State<ShopsScreen> {
                     ),
                   )
                 : _filteredShops.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              Icons.store_outlined,
-                              size: 64,
-                              color: AppTheme.lightGrey,
+                            Container(
+                              padding: const EdgeInsets.all(32),
+                              decoration: BoxDecoration(
+                                color: AppTheme.lightPink.withOpacity(0.3),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.store_outlined,
+                                size: 64,
+                                color: AppTheme.primaryPink,
+                              ),
                             ),
-                            SizedBox(height: 16),
-                            Text(
+                            const SizedBox(height: 24),
+                            const Text(
                               'No shops found',
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
                                 color: AppTheme.darkGrey,
                               ),
                             ),
-                            SizedBox(height: 8),
-                            Text(
+                            const SizedBox(height: 8),
+                            const Text(
                               'Try adjusting your search',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: AppTheme.lightGrey,
+                                color: AppTheme.mediumGrey,
                               ),
                             ),
                           ],
@@ -259,7 +276,7 @@ class _ShopsScreenState extends State<ShopsScreen> {
     return Card(
       elevation: 4,
       margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: InkWell(
         onTap: () async {
           await Navigator.push(
@@ -271,166 +288,201 @@ class _ShopsScreenState extends State<ShopsScreen> {
           // Refresh subscriptions after returning
           _loadSubscriptions();
         },
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              // Shop Image/Icon
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: AppTheme.lightGrey,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Stack(
-                  children: [
-                    const Center(
-                      child: Icon(
-                        Icons.store,
-                        size: 40,
-                        color: AppTheme.primaryPink,
-                      ),
-                    ),
-                    if (isSubscribed)
-                      Positioned(
-                        top: 4,
-                        right: 4,
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: const BoxDecoration(
-                            color: AppTheme.successGreen,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.notifications_active,
-                            size: 16,
-                            color: AppTheme.white,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 16),
-
-              // Shop Details
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            shop.name,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.darkGrey,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: shop.isOpen ? Colors.green : Colors.red,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            shop.isOpen ? 'Open' : 'Closed',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppTheme.white,
+                AppTheme.primaryPink.withOpacity(0.03),
+              ],
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                // Shop Image/Icon
+                Container(
+                  width: 90,
+                  height: 90,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        AppTheme.primaryPink.withOpacity(0.2),
+                        AppTheme.lightPink.withOpacity(0.3),
                       ],
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      shop.description,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: AppTheme.darkGrey,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Stack(
+                    children: [
+                      const Center(
+                        child: Icon(
+                          Icons.store,
+                          size: 45,
+                          color: AppTheme.primaryPink,
+                        ),
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppTheme.primaryPink.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            shop.category,
-                            style: const TextStyle(
-                              color: AppTheme.primaryPink,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
+                      if (isSubscribed)
+                        Positioned(
+                          top: 6,
+                          right: 6,
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: const BoxDecoration(
+                              color: AppTheme.successGreen,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.notifications_active,
+                              size: 16,
+                              color: AppTheme.white,
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        if (isSubscribed)
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+
+                // Shop Details
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              shop.name,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: AppTheme.darkGrey,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
+                              horizontal: 10,
+                              vertical: 5,
                             ),
                             decoration: BoxDecoration(
-                              color: AppTheme.successGreen.withOpacity(0.1),
+                              color: shop.isOpen ? AppTheme.successGreen : AppTheme.errorRed,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              shop.isOpen ? 'Open' : 'Closed',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        shop.description,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: AppTheme.mediumGrey,
+                          height: 1.3,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryPink.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              shop.category,
+                              style: const TextStyle(
+                                color: AppTheme.primaryPink,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          if (isSubscribed)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppTheme.successGreen.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.notifications_active,
+                                    size: 12,
+                                    color: AppTheme.successGreen,
+                                  ),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    'Subscribed',
+                                    style: TextStyle(
+                                      color: AppTheme.successGreen,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          const Spacer(),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.amber.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: const Row(
-                              mainAxisSize: MainAxisSize.min,
+                            child: Row(
                               children: [
-                                Icon(
-                                  Icons.notifications_active,
-                                  size: 12,
-                                  color: AppTheme.successGreen,
-                                ),
-                                SizedBox(width: 4),
+                                const Icon(Icons.star, color: Colors.amber, size: 16),
+                                const SizedBox(width: 4),
                                 Text(
-                                  'Subscribed',
-                                  style: TextStyle(
-                                    color: AppTheme.successGreen,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
+                                  shop.rating.toString(),
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppTheme.darkGrey,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        const Spacer(),
-                        const Icon(Icons.star, color: Colors.amber, size: 16),
-                        const SizedBox(width: 4),
-                        Text(
-                          shop.rating.toString(),
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: AppTheme.darkGrey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

@@ -10,6 +10,7 @@ import '../../services/location_service.dart';
 import '../../widgets/shimmer_loading.dart';
 import '../../models/product_model.dart';
 import '../shops/shops_screen.dart';
+import '../shops/shop_products_screen.dart';
 import 'notifications_screen.dart';
 import '../maps/nearby_shops_map_screen.dart';
 
@@ -176,28 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
               const SizedBox(height: 16),
 
-              // Products Section
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Available Products',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.darkGrey,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ShopsScreen())),
-                      child: const Text('View Shops', style: TextStyle(color: AppTheme.primaryPink)),
-                    ),
-                  ],
-                ),
-              ),
-
+              // Products Section - Shop-wise Carousel
               Consumer<ProductProvider>(
                 builder: (context, productProvider, child) {
                   if (productProvider.isLoading) {
@@ -223,18 +203,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     return _buildEmptyState();
                   }
 
-                  return GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.75,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                    ),
-                    itemCount: products.length,
-                    itemBuilder: (context, index) => _buildProductCard(products[index]),
+                  // Group products by shop
+                  final Map<String, List<Product>> shopProducts = {};
+                  for (var product in products) {
+                    if (!shopProducts.containsKey(product.shopName)) {
+                      shopProducts[product.shopName] = [];
+                    }
+                    shopProducts[product.shopName]!.add(product);
+                  }
+
+                  return Column(
+                    children: shopProducts.entries.map((entry) {
+                      return _buildShopSection(entry.key, entry.value);
+                    }).toList(),
                   );
                 },
               ),
@@ -584,6 +565,91 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       itemCount: 6,
       itemBuilder: (context, index) => const ProductShimmer(),
+    );
+  }
+
+  Widget _buildShopSection(String shopName, List<Product> products) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryPink.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.store,
+                      color: AppTheme.primaryPink,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        shopName,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.darkGrey,
+                        ),
+                      ),
+                      Text(
+                        '${products.length} products',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.mediumGrey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ShopProductsScreen(shopName: shopName),
+                    ),
+                  );
+                },
+                child: const Text(
+                  'View All',
+                  style: TextStyle(color: AppTheme.primaryPink),
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 240,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            itemCount: products.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: SizedBox(
+                  width: 160,
+                  child: _buildProductCard(products[index]),
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 8),
+      ],
     );
   }
 

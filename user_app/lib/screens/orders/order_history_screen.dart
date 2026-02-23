@@ -85,7 +85,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> with SingleTick
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.white,
+      backgroundColor: AppTheme.softPink,
       appBar: AppBar(
         title: const Text('My Orders'),
         backgroundColor: AppTheme.primaryPink,
@@ -97,6 +97,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> with SingleTick
           indicatorWeight: 3,
           labelColor: AppTheme.white,
           unselectedLabelColor: AppTheme.white.withOpacity(0.7),
+          labelStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           tabs: [
             Tab(
               child: Row(
@@ -236,9 +237,9 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> with SingleTick
 
   Widget _buildOrderCard(Order order) {
     return Card(
-      elevation: 2,
+      elevation: 3,
       margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         onTap: () {
           Navigator.push(
@@ -248,195 +249,257 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> with SingleTick
             ),
           ).then((_) => _loadOrders()); // Refresh when coming back
         },
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Order Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          order.shopName,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.darkGrey,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppTheme.white,
+                AppTheme.primaryPink.withOpacity(0.02),
+              ],
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Order Header
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryPink.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(
+                              Icons.store,
+                              color: AppTheme.primaryPink,
+                              size: 24,
+                            ),
                           ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  order.shopName,
+                                  style: const TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppTheme.darkGrey,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  _formatDate(order.createdAt),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppTheme.mediumGrey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    _buildStatusBadge(order.status),
+                  ],
+                ),
+
+                const Divider(height: 24),
+
+                // Order Items Summary
+                Row(
+                  children: [
+                    const Icon(Icons.shopping_bag_outlined, size: 18, color: AppTheme.mediumGrey),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${order.items.length} ${order.items.length == 1 ? 'item' : 'items'}',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: AppTheme.mediumGrey,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+
+                // Total Amount
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryPink.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Total Amount',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.darkGrey,
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          _formatDate(order.createdAt),
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: AppTheme.mediumGrey,
+                      ),
+                      Text(
+                        '₹${order.totalAmount.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.primaryPink,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Status Message
+                if (order.status == OrderStatus.Pending) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppTheme.warningYellow.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: AppTheme.warningYellow.withOpacity(0.3)),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.access_time, size: 20, color: AppTheme.warningYellow),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            'Waiting for shop owner to accept',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: AppTheme.darkGrey,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  _buildStatusBadge(order.status),
-                ],
-              ),
-
-              const Divider(height: 24),
-
-              // Order Items Summary
-              Text(
-                '${order.items.length} ${order.items.length == 1 ? 'item' : 'items'}',
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: AppTheme.mediumGrey,
-                ),
-              ),
-              const SizedBox(height: 8),
-
-              // Total Amount
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Total Amount',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: AppTheme.darkGrey,
+                ] else if (order.status == OrderStatus.Accepted) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppTheme.successGreen.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: AppTheme.successGreen.withOpacity(0.3)),
                     ),
-                  ),
-                  Text(
-                    '₹${order.totalAmount.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.primaryPink,
-                    ),
-                  ),
-                ],
-              ),
-
-              // Status Message
-              if (order.status == OrderStatus.Pending) ...[
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppTheme.warningYellow.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppTheme.warningYellow.withOpacity(0.3)),
-                  ),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.access_time, size: 20, color: AppTheme.warningYellow),
-                      SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'Waiting for shop owner to accept',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: AppTheme.darkGrey,
+                    child: Row(
+                      children: [
+                        const Icon(Icons.check_circle, size: 20, color: AppTheme.successGreen),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Order accepted by shop owner!',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppTheme.darkGrey,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.primaryPink,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  'Pickup Code: ${order.pickupPin}',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppTheme.white,
+                                    letterSpacing: 1.2,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ] else if (order.status == OrderStatus.Accepted) ...[
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppTheme.successGreen.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppTheme.successGreen.withOpacity(0.3)),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.check_circle, size: 20, color: AppTheme.successGreen),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Order accepted by shop owner!',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                                color: AppTheme.darkGrey,
-                              ),
+                ] else if (order.status == OrderStatus.Cancelled) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppTheme.errorRed.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: AppTheme.errorRed.withOpacity(0.3)),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.cancel, size: 20, color: AppTheme.errorRed),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            'Order rejected by shop owner',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: AppTheme.darkGrey,
+                              fontWeight: FontWeight.w500,
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Pickup Code: ${order.pickupPin}',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: AppTheme.primaryPink,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ] else if (order.status == OrderStatus.Cancelled) ...[
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppTheme.errorRed.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppTheme.errorRed.withOpacity(0.3)),
-                  ),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.cancel, size: 20, color: AppTheme.errorRed),
-                      SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'Order rejected by shop owner',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: AppTheme.darkGrey,
                           ),
                         ),
+                      ],
+                    ),
+                  ),
+                ],
+
+                // View Details Button
+                const SizedBox(height: 14),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OrderDetailsScreen(order: order),
+                        ),
+                      ).then((_) => _loadOrders());
+                    },
+                    icon: const Icon(Icons.visibility_outlined, size: 20),
+                    label: const Text('View Details'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryPink,
+                      foregroundColor: AppTheme.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                    ],
+                      elevation: 2,
+                    ),
                   ),
                 ),
               ],
-
-              // View Details Button
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => OrderDetailsScreen(order: order),
-                      ),
-                    ).then((_) => _loadOrders());
-                  },
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppTheme.primaryPink,
-                    side: const BorderSide(color: AppTheme.primaryPink),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text('View Details'),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
