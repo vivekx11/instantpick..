@@ -13,7 +13,7 @@ import 'screens/splash_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize network service
+  // Initialize network service..
   final networkService = NetworkService();
   await networkService.initialize();
   
