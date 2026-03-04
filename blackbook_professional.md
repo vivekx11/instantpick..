@@ -1,5 +1,5 @@
 ---
-# INSTANT PICK
+# INSTANT PICK.
 ## Final Year Project Black Book
 ### Department of Computer Science and Engineering
 ---
