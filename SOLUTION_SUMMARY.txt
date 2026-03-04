@@ -2,7 +2,7 @@
   SOLUTION: Make Your App Work on All Devices
 ═══════════════════════════════════════════════════════════════
 
-PROBLEM:
+PROBLEM:-
   Your app uses localhost:3001 which only works on the same computer.
   You want it to work on ANY device, ANY network.
 
