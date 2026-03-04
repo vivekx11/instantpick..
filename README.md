@@ -1,4 +1,4 @@
-# 🛍️ Complete Marketplace System...
+# 🛍️ Complete Marketplace System
 
 A full-featured marketplace system with separate apps for shop owners and customers, built with Flutter and Node.js.
 
