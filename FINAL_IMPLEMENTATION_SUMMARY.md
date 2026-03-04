@@ -1,6 +1,6 @@
 # Map Workflow - Complete Implementation Summary
 
-## ✅ COMPLETED FEATURES
+## ✅ COMPLETED FEATURES.
 
 ### 1. Backend Implementation
 - ✅ Shop model with location fields (Point, deliveryRadius, locationSet)
