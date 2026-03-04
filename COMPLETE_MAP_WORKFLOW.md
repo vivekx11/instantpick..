@@ -1,4 +1,4 @@
-# Complete Map Workflow Implementation....
+# Complete Map Workflow Implementation
 
 ## Shop Owner Flow
 
