@@ -1,4 +1,4 @@
-# 📸 Firebase Photo Upload for Shop Owner App
+# 📸 Firebase Photo Upload for Shop Owner App.
 
 ## ✅ What's Been Added
 
